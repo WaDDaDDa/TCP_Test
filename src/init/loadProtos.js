@@ -20,7 +20,7 @@ const getAllProtoFiles = (dir, fileList = []) => {
     const filePath = path.join(dir, file);
     if (fs.statSync(filePath).isDirectory()) {
       getAllProtoFiles(filePath, fileList);
-    } else if(path.extname(file) === ".proto") {
+    } else if (path.extname(file) === ".proto") {
       fileList.push(filePath);
     }
   });
@@ -32,23 +32,28 @@ const protoFiles = getAllProtoFiles(protoDir);
 
 const protoMessages = {};
 
-export const loadProtos =async () => {
-    try{
-        const root = new protobuf.Root();
+export const loadProtos = async () => {
+  try {
+    const root = new protobuf.Root();
 
-        await Promise.all(protoFiles.map((file) => root.load(file)));
+    await Promise.all(protoFiles.map((file) => root.load(file)));
 
-        // entries를 통해 key와 value를 다 가져온다. packetName에서 정의한 key common, response
-        for(const [packageName, types] of Object.entries(packetNames)){
-            protoMessages[packageName] = {};
-            for(const [type, typeName] of Object.entries(types)){
-                protoMessages[packageName][type] = root.lookupType(typeName);
-            }
-        }
-        console.log(protoMessages);
-
-        console.log("Protobuf 파일이 로드되었습니다.")
-    } catch(err){
-        console.error("Protobuf 파일 로드 중 오류가 발생했습니다.", err);
+    // entries를 통해 key와 value를 다 가져온다. packetName에서 정의한 key common, response
+    for (const [packageName, types] of Object.entries(packetNames)) {
+      protoMessages[packageName] = {};
+      for (const [type, typeName] of Object.entries(types)) {
+        protoMessages[packageName][type] = root.lookupType(typeName);
+      }
     }
-}
+
+    console.log("Protobuf 파일이 로드되었습니다.");
+  } catch (err) {
+    console.error("Protobuf 파일 로드 중 오류가 발생했습니다.", err);
+  }
+};
+
+// 로드된 프로토 메시지들의 얕은 복사본을 반환합니다.
+export const getProtoMessages = () => {
+  // console.log('protoMessages:', protoMessages); // 디버깅을 위해 추가
+  return { ...protoMessages };
+};
