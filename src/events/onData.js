@@ -1,9 +1,10 @@
 import { config } from "../config/config.js";
 import { PACKET_TYPE } from "../constants/header.js";
+import { getHandlerById } from "../handlers/index.js";
 import { packetParser } from "../utils/parser/packetParser.js";
 
 // 데이터 스트림으로 서버와 클라이언트가 데이터를 주고 받음.
-export const onData = (socket) => (data) => {
+export const onData = (socket) => async (data) => {
   // 기존 버퍼에 새로 수신된 데이터를 추가
   // Buffer.concat은 여러개의 버퍼를 하나로 병합하는 역할을 합니다.
   // 소켓에 이미 수신된 데이터 socket.buffer와 새로 수신된 데이터 data를 Buffer.concat을 통해 하나의 버퍼로 합친후 socket.buffer에 저장합니다.
@@ -27,7 +28,6 @@ export const onData = (socket) => (data) => {
 
       console.log(`length(패킷 전체길이) : ${length}`);
       console.log(`packetType(패킷 타입): ${packetType}`);
-      console.log(packet);
 
       switch (packetType) {
         case PACKET_TYPE.PING:
@@ -35,10 +35,18 @@ export const onData = (socket) => (data) => {
         case PACKET_TYPE.NORMAL:
           const { handlerId, sequence, payload, userId } = packetParser(packet);
           
-          console.log('handlerId:', handlerId);
-          console.log('userId:', userId);
-          console.log('payload:', payload);
-          console.log('sequence:', sequence);
+          const user = getUserById(userId);
+          // 유저가 접속해 있는 상황에서 시퀀스 검증
+          if (user && user.sequence !== sequence) {
+            console.error('잘못된 호출 값입니다.');
+          }
+
+          const handler = getHandlerById(handlerId);
+          await handler({
+            socket,
+            userId,
+            payload,
+          });
       }
     } else {
         // 아직 전체 패킷이 도착하지 않음.
