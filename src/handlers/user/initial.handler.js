@@ -5,6 +5,7 @@ import { createResponse } from '../../utils/response/createResponse.js';
 const initialHandler = async ({ socket, userId, payload }) => {
   const { deviceId } = payload;
 
+  try{
     // 유저의 정보 socket, deviceId를 세션에 저장
     addUser(socket, deviceId);
     
@@ -16,8 +17,12 @@ const initialHandler = async ({ socket, userId, payload }) => {
         deviceId,
     );
 
+    
     // 소켓을 통해 클라이언트에게 응답 메시지 전송
     socket.write(initialResponse);
+  } catch(err) {
+    handlerError(socket, err);
+  }
 };
 
 export default initialHandler;

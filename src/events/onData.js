@@ -1,6 +1,9 @@
 import { config } from "../config/config.js";
 import { PACKET_TYPE } from "../constants/header.js";
 import { getHandlerById } from "../handlers/index.js";
+import CustomError from "../utils/error/customError.js";
+import { ErrorCodes } from "../utils/error/errorCodes.js";
+import { handleError } from "../utils/error/errorHandler.js";
 import { packetParser } from "../utils/parser/packetParser.js";
 
 // 데이터 스트림으로 서버와 클라이언트가 데이터를 주고 받음.
@@ -29,28 +32,34 @@ export const onData = (socket) => async (data) => {
       console.log(`length(패킷 전체길이) : ${length}`);
       console.log(`packetType(패킷 타입): ${packetType}`);
 
-      switch (packetType) {
-        case PACKET_TYPE.PING:
-          break;
-        case PACKET_TYPE.NORMAL:
-          const { handlerId, sequence, payload, userId } = packetParser(packet);
-          
-          const user = getUserById(userId);
-          // 유저가 접속해 있는 상황에서 시퀀스 검증
-          if (user && user.sequence !== sequence) {
-            console.error('잘못된 호출 값입니다.');
-          }
+      try {
+        switch (packetType) {
+          case PACKET_TYPE.PING:
+            break;
+          case PACKET_TYPE.NORMAL:
+            const { handlerId, sequence, payload, userId } =
+              packetParser(packet);
 
-          const handler = getHandlerById(handlerId);
-          await handler({
-            socket,
-            userId,
-            payload,
-          });
+            const user = getUserById(userId);
+            // 유저가 접속해 있는 상황에서 시퀀스 검증
+            if (user && user.sequence !== sequence) {
+              throw new CustomError(ErrorCodes.INVALID_SEQUENCE, "잘못된 호출 값입니다.");
+            }
+
+            const handler = getHandlerById(handlerId);
+            
+            await handler({
+              socket,
+              userId,
+              payload,
+            });
+        }
+      } catch (error) {
+        handleError(socket, error);
       }
     } else {
-        // 아직 전체 패킷이 도착하지 않음.
-        break;
+      // 아직 전체 패킷이 도착하지 않음
+      break;
     }
   }
 };
