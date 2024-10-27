@@ -12,6 +12,7 @@ const createPool = (dbConfig) => {
         user: dbConfig.user,
         password: dbConfig.password,
         database: dbConfig.database,
+        database: dbConfig.name,
         waitForConnections: true, // 대기열을 만들건지
         connectionLimit: 10, // 커넥션 풀에서 최대 연결 수
         queueLimit: 0, // 0일 경우 무제한 대기열
