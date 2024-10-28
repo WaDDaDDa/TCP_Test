@@ -7,20 +7,18 @@ class Game{
         this.state = "waiting"; // "waiting" "inProgress"
     }
 
-    addUser(user){
-        if(this.users.length >= MAX_PLAYERS)
-        {
-            throw new Error("Game seesion is full");
+    addUser(user) {
+        if (this.users.length >= MAX_PLAYERS) {
+          throw new Error('Game session is full');
         }
-
         this.users.push(user);
-
-        if(this.users.length === MAX_PLAYERS){
-            serTimeOut(() => {
-                this.startGame();
-            }, 3000); // 3초뒤 게임 시작
+    
+        if (this.users.length === MAX_PLAYERS) {
+          setTimeout(() => {
+            this.startGame();
+          }, 3000);
         }
-    }
+      }
 
     getUser(userId){
         return this.users.find((user) => user.id === userId);

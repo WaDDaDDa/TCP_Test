@@ -24,7 +24,7 @@ const initialHandler = async ({ socket, userId, payload }) => {
     }
 
     // 유저의 정보 socket, deviceId를 세션에 저장
-    addUser(socket, deviceId);
+    addUser(socket, user.id);
 
     // 유저 정보 응답 생성
     const initialResponse = createResponse(
