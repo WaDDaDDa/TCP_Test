@@ -1,8 +1,9 @@
 import { userSessions } from './sessions.js';
+import User from '../classes/models/user.class.js';
 
 //우선 지금 당장 필요한 것은 유저 추가, 삭제, 조회 정도 입니다. 유저 추가시에는 socket, uuid, sequence (호출 횟수)를 객체에 넣습니다.
 export const addUser = (socket, uuid) => {
-  const user = { socket, id: uuid, sequence: 0 };
+  const user = new User(uuid, socket);
   userSessions.push(user);
   return user;
 };
@@ -25,7 +26,8 @@ export const getUserById = (id) => {
 export const getNextSequence = (id) => {
     const user = getUserById(id);
     if (user) {
-      return ++user.sequence;
+      return user.getNextSequence();
     }
     return null;
   };
+  
