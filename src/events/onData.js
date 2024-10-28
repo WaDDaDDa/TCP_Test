@@ -5,6 +5,7 @@ import CustomError from "../utils/error/customError.js";
 import { ErrorCodes } from "../utils/error/errorCodes.js";
 import { handleError } from "../utils/error/errorHandler.js";
 import { packetParser } from "../utils/parser/packetParser.js";
+import { getUserById } from "../session/user.session.js";
 
 // 데이터 스트림으로 서버와 클라이언트가 데이터를 주고 받음.
 export const onData = (socket) => async (data) => {
@@ -43,11 +44,14 @@ export const onData = (socket) => async (data) => {
             const user = getUserById(userId);
             // 유저가 접속해 있는 상황에서 시퀀스 검증
             if (user && user.sequence !== sequence) {
-              throw new CustomError(ErrorCodes.INVALID_SEQUENCE, "잘못된 호출 값입니다.");
+              throw new CustomError(
+                ErrorCodes.INVALID_SEQUENCE,
+                "잘못된 호출 값입니다."
+              );
             }
 
             const handler = getHandlerById(handlerId);
-            
+
             await handler({
               socket,
               userId,
