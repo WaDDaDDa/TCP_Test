@@ -19,6 +19,10 @@ export const getUserById = (id) => {
   return userSessions.find((user) => user.id === id);
 };
 
+export const getUserBySocket = (socket) => {
+  return userSessions.find((user) => user.socket === socket);
+};
+
 // 서버는 클라이언트의 요청이 끝날때마다 시퀀스의 값에 1을 더하여 보내줍니다.
 // 클라이언트는 받은 시퀀스넘버를 다음 요청에서 사용하게됩니다.
 // user.session.js 파일에 시퀀스 관련 함수를 추가해봅시다. 
@@ -30,4 +34,3 @@ export const getNextSequence = (id) => {
     }
     return null;
   };
-  

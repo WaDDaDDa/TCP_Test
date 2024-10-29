@@ -3,7 +3,7 @@ import initServer from "./init/index.js";
 import { config } from "./config/config.js";
 import { onConnection } from "./events/onConnection.js";
 
-const PORT = 5555;
+const PORT = 3000;
 
 const server = net.createServer(onConnection);
 

@@ -7,6 +7,7 @@ export const onEnd = (socket) => () => {
   console.log(userSessions);
   console.log(gameSessions);
   
+  console.log("유저삭삭");
   // 세션에서 유저 삭제
   removeUser(socket);
 };
